@@ -68,26 +68,38 @@ def main():
     
     st.markdown("""
     The system will analyze your stock portfolio and provide recommendations.
+    Upload a PDF file or enter the portfolio manually below.
     """)
     
+    # File uploader
     uploaded_file = st.file_uploader("Upload your portfolio PDF", type="pdf")
-    
-    if uploaded_file is not None:
-        portfolio_text = extract_text_from_pdf(uploaded_file)
 
+    # Text input area as an alternative
+    manual_input = st.text_area("Or enter your portfolio details manually:")
+
+    portfolio_text = ""
+
+    if uploaded_file is not None:
+        # Priority to PDF if both are provided
+        portfolio_text = extract_text_from_pdf(uploaded_file)
+        st.success("PDF uploaded and text extracted.")
+    elif manual_input.strip():
+        portfolio_text = manual_input
+        st.success("Manual input received.")
+    else:
+        st.info("Please upload a PDF file or enter the portfolio manually.")
+
+    if portfolio_text:
         st.write("Processing portfolio... Please wait.")
         recommendations = analyze_portfolio_from_text(portfolio_text)
         
         if recommendations:
             display_recommendations(recommendations)
         else:
-            st.write("Sorry, there was an error processing the portfolio.")
-    
-    else:
-        st.write("Please upload a PDF file of your portfolio.")
-    
+            st.error("Sorry, there was an error processing the portfolio.")
+
     st.markdown("""
-    **Note:** Upload a PDF to analyze your portfolio.
+    **Note:** You can use either the upload or manual entry method.
     """)
 
 if __name__ == "__main__":
